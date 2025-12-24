@@ -27,32 +27,19 @@ const int wallRewardValue = -500;
 const int floorRewardValue = -10;
 const int goalRewardValue = 500;
 
-void SetUpRewards(int[,] maze, int wallValue, int floorValue, int goalValue)
-{
-    int mazeRows = maze.GetLength(0);
-    int mazeCols = maze.GetLength(1);
-    rewards = new int[mazeRows, mazeCols];
-    for (int row = 0; row < mazeRows; row++)
-    {
-        for (int col = 0; col < mazeCols; col++)
-        {
-            switch (maze[row, col])
-            {
-                case 0:
-                    rewards[row, col] = wallValue;
-                    break;
-                case 1:
-                    rewards[row, col] = floorValue;
-                    break;
-                case 2:
-                    rewards[row, col] = goalValue;
-                    break;
-            }
-        }
-    }
-}
-
 torch.Tensor qValues;
+
+const float epsilon = 0.95f; //exploration factor
+const float discountFactor = 0.8f; //discount factor
+const float learningRate = 0.9f; //learning rate
+const int episodes = 1500; //number of training episodes    
+const int startRow = 11;
+const int startCol = 5;
+SetUpRewards(maze1, wallRewardValue, floorRewardValue, goalRewardValue);
+SetupQValues(maze1);
+TrainModel(maze1, floorRewardValue, epsilon, discountFactor, learningRate, episodes);
+NavigateMaze(maze1, startRow, startCol, floorRewardValue, wallRewardValue);
+return;
 
 void SetupQValues(int[,] maze)
 {
@@ -132,7 +119,7 @@ void TrainModel(int[,] maze, int floorValue, double epsilon, double discountFact
     );
 }
 
-List<int[]> navigateMaze(int[,] maze, int startRow, int startCol, int floorValue, int wallValue)
+List<int[]> NavigateMaze(int[,] maze, int startRow, int startCol, int floorValue, int wallValue)
 {
     List<int[]> path = new List<int[]>();
     if (HasHitWallOrEndOfMaze(startRow, startCol, floorValue))
@@ -171,13 +158,27 @@ List<int[]> navigateMaze(int[,] maze, int startRow, int startCol, int floorValue
     return path;
 }
 
-const float epsilon = 0.95f; //exploration factor
-const float discountFactor = 0.8f; //discount factor
-const float learningRate = 0.9f; //learning rate
-const int episodes = 1500; //number of training episodes    
-const int startRow = 11;
-const int startCol = 5;
-SetUpRewards(maze1, wallRewardValue, floorRewardValue, goalRewardValue);
-SetupQValues(maze1);
-TrainModel(maze1, floorRewardValue, epsilon, discountFactor, learningRate, episodes);
-navigateMaze(maze1, startRow, startCol, floorRewardValue, wallRewardValue);
+void SetUpRewards(int[,] maze, int wallValue, int floorValue, int goalValue)
+{
+    int mazeRows = maze.GetLength(0);
+    int mazeCols = maze.GetLength(1);
+    rewards = new int[mazeRows, mazeCols];
+    for (int row = 0; row < mazeRows; row++)
+    {
+        for (int col = 0; col < mazeCols; col++)
+        {
+            switch (maze[row, col])
+            {
+                case 0:
+                    rewards[row, col] = wallValue;
+                    break;
+                case 1:
+                    rewards[row, col] = floorValue;
+                    break;
+                case 2:
+                    rewards[row, col] = goalValue;
+                    break;
+            }
+        }
+    }
+}
