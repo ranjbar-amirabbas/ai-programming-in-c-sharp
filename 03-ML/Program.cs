@@ -1,9 +1,6 @@
-﻿using System;
-using System.Globalization;
-using System.IO;
-using System.Linq;
+﻿using System.Globalization;
+using _03_ML;
 using Microsoft.ML;
-using Microsoft.ML.Data;
 
 // ----------------------------------------------------
 // 1) Create ML.NET context (entry point for all ML ops)
@@ -135,30 +132,4 @@ while (true)
         });
 
     Console.WriteLine($"Predicted Price: {prediction.PredictedPrice}\n");
-}
-
-// ----------------------------------------------------
-// Data input schema (matches CSV columns)
-// ----------------------------------------------------
-public class HousingData
-{
-    [LoadColumn(0)]
-    public float SquareFeet { get; set; }
-
-    [LoadColumn(1)]
-    public float Bedrooms { get; set; }
-
-    // Label column (what the model learns to predict)
-    [LoadColumn(2)]
-    public float Price { get; set; }
-}
-
-// ----------------------------------------------------
-// Model output schema
-// ----------------------------------------------------
-public class HousingPrediction
-{
-    // Regression predictions are stored in "Score"
-    [ColumnName("Score")]
-    public float PredictedPrice { get; set; }
 }
